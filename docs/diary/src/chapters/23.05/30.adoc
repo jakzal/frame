@@ -1,0 +1,41 @@
+= The one with the goal
+
+I'm building a digital frame based on a Raspberry Pi.
+
+The main **goal** is to make it **displays photos from an sdcard in my living room**.
+
+image::frame-concept.svg[Frame concept]
+
+Once the main goal is achieved I will look into additional features.
+Some of the ideas I have include:
+
+* to show weather in my location
+* to play videos
+* to show media from the cloud
+* to control lights
+* to show temperature gathered from room sensors by homeassistant
+* to show a picture submitted to the frame via HTTP or bluetooth
+* to control the frame with a touch interface
+* to control the frame with an HTTP based API
+* to provide a way to write custom plugins
+
+I already have some great ideas for a greatly overcomplicated architecture.
+There's so many cool things we could do with https://mqtt.org[MQTT].
+
+I will keep these ideas at bay but let them inform my design.
+I will only introduce enough complexity that's required for the current or upcoming features.
+Hopefully, this will be a nice demonstration of how to practice evolutionary design.
+
+As with most projects the budget is limited. In this case, the budget is my availability and interest.
+Once I run out of those the project might be killed.
+
+I will implement it in a language I enjoy, not the one that's best for the platform I've chosen.
+I'm doing it for fun after all.
+
+I do not enjoy Python. I do enjoy **Kotlin**.
+
+I have used Kotlin before but only within a web realm.
+I have never built desktop application in Kotlin, so this will be a new experience for me.
+
+Ideally, I'd like the application to run on more platforms than just the Raspberry Pi.
+I'd like it to run with minimum dependencies and required setup.

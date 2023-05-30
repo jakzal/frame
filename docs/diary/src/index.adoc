@@ -7,3 +7,20 @@ v1.0.0
 :imagesdir: images
 :data-uri:
 :source-highlighter: rouge
+
+
+[preface]
+= Introduction
+
+We're building a digital frame.
+As an experiment, we're recording our struggles and decisions in this diary.
+
+= 2023
+
+The year is 2023. The project is born.
+
+:leveloffset: +1
+
+include::chapters/23.05/index.adoc[]
+
+:leveloffset: -1
