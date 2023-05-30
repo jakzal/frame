@@ -14,4 +14,4 @@ function build_html() {
   [[ "$output" -eq "" ]] || echo $output
 }
 
-build_html "Diary (HTML)" "diary/src/index.adoc" "build/diary.html"
+build_html "Diary (HTML)" "docs/diary/src/index.adoc" "docs/build/diary.html"

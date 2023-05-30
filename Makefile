@@ -1,9 +1,9 @@
 default: build
 
 build:
-	@docker run -t --rm --name docs -v ${CURDIR}:/docs -w /docs jakzal/asciidoctor bin/build.sh
+	@docker run -t --rm --name docs -v ${CURDIR}:/frame -w /frame jakzal/asciidoctor docs/bin/build.sh
 .PHONY: build
 
 clean:
-	@rm -rf build/**
+	@rm -rf docs/build/**
 .PHONY: clean
