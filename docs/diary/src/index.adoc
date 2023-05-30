@@ -1,0 +1,9 @@
+= Frame Project Diary
+Jakub Zalas <jakub@zalas.pl>
+v1.0.0
+:doctype: book
+:toc:
+:toclevels: 0
+:imagesdir: images
+:data-uri:
+:source-highlighter: rouge
