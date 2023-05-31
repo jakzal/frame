@@ -10,7 +10,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.delay
 import java.io.InputStream
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 @Preview
@@ -19,6 +21,10 @@ fun App() {
     MaterialTheme {
         Column {
             Image(loadImageBitmap(displayedPhoto), "Default photo", modifier = Modifier.fillMaxSize())
+        }
+        LaunchedEffect(Unit) {
+            delay(4.seconds)
+            displayedPhoto = object {}::class.java.getResource("/koala-bis.jpg").openStream()
         }
     }
 }
