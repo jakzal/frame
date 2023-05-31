@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 
 @Composable
 @Preview
@@ -25,7 +27,8 @@ private fun ColumnScope.defaultPhoto(): ImageBitmap =
     loadImageBitmap(this::class.java.getResource("/koala.jpg").openStream())
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "Frame") {
+    val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
+    Window(onCloseRequest = ::exitApplication, title = "Frame", state = state) {
         App()
     }
 }
