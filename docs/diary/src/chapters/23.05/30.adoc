@@ -4,6 +4,7 @@ I'm building a digital frame based on a Raspberry Pi.
 
 The main **goal** is to make it **displays photos from an sdcard in my living room**.
 
+.Frame concept
 image::frame-concept.svg[Frame concept]
 
 Once the main goal is achieved I will look into additional features.
