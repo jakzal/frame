@@ -25,7 +25,7 @@ private fun ColumnScope.defaultPhoto(): ImageBitmap =
     loadImageBitmap(this::class.java.getResource("/koala.jpg").openStream())
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    Window(onCloseRequest = ::exitApplication, title = "Frame") {
         App()
     }
 }
