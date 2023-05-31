@@ -17,20 +17,19 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 @Preview
 fun App() {
-    var displayedPhoto by remember { mutableStateOf(defaultPhotoStream()) }
+    var displayedPhoto by remember { mutableStateOf(resourceStream("koala.jpg")) }
     MaterialTheme {
         Column {
             Image(loadImageBitmap(displayedPhoto), "Default photo", modifier = Modifier.fillMaxSize())
         }
         LaunchedEffect(Unit) {
             delay(4.seconds)
-            displayedPhoto = object {}::class.java.getResource("/koala-bis.jpg").openStream()
+            displayedPhoto = resourceStream("koala-bis.jpg")
         }
     }
 }
 
-private fun defaultPhotoStream(): InputStream =
-    object {}::class.java.getResource("/koala.jpg").openStream()
+private fun resourceStream(name: String): InputStream = object {}::class.java.getResource("/$name").openStream()
 
 fun main() = application {
     val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
