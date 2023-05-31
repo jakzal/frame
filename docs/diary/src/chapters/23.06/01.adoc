@@ -1,0 +1,95 @@
+= The one with experiments
+
+Previously, I have managed to display a sequence of photos with Compose.
+However, all the changes were triggered from within composables.
+This isn't ideal given I prefer to have business logic decoupled from the UI.
+Before I can continue with Compose I need to confirm I will be able to trigger updates from a different scope.
+
+== Triggering photo updates from the outside of a composable
+
+Jetpack Compose documentation proved to be useful. I was initially overthinking it,
+but in the end all it took was to pass the `MutableState` to the composable (the `App` in this case).
+Compose takes care of the rest, recomposing composables when required.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=26adefc85821b69abe8490c7fea43cf4f2042e25,lines=19..29]
+----
+
+This way I was able to run two coroutines in main and update the photo from the second coroutine.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=26adefc85821b69abe8490c7fea43cf4f2042e25,lines=33..47]
+----
+
+Promising.
+
+== Experimenting with commands
+
+At this point I got excited and wanted to see how it would look like with commands.
+I quickly added an interface with a single implementation.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=c0144e923da95996db505580a543bbc335bf1aff,lines=35..37]
+----
+
+In main, I now needed to create the command instead of a resource stream.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=c0144e923da95996db505580a543bbc335bf1aff,lines=38..52]
+----
+
+Finally, the App should take the command and pass it down.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=c0144e923da95996db505580a543bbc335bf1aff,lines=19..31]
+----
+
+== Creating a composable
+
+One other thing to try was to create my own composable.
+Extract function refactoring in IntelliJ did most of the job.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=76daf3a90ff69ae02963e58634c0220522b335d9,lines=29..35]
+----
+
+I can count on Compose passing the command down when it's updated.
+
+The `App` remembers the state and composes UI components.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=76daf3a90ff69ae02963e58634c0220522b335d9,lines=19..28]
+----
+
+== Trying out actors
+
+Since Kotlin has a (limited) https://kotlinlang.org/docs/shared-mutable-state-and-concurrency.html#actors[actor support]
+built in, I also experimented with an actor based command dispatcher.
+
+[source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=389d777dbf07a5fc71c23f32f3216acbc20b0455,lines=43..62]
+----
+
+Interestingly, the current actor implementation is obsolete and might be
+https://github.com/Kotlin/kotlinx.coroutines/issues/87[replaced with a more complex API in the future].
+
+== Summary
+
+I feel it went rather smooth if I ignore the initial Googling for StackOverflow hints.
+Jetpack Compose documentation is pretty good.

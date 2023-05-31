@@ -23,4 +23,6 @@ The year is 2023. The project is born.
 
 include::chapters/23.05/index.adoc[]
 
+include::chapters/23.06/index.adoc[]
+
 :leveloffset: -1
