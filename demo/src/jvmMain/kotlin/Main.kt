@@ -22,11 +22,15 @@ fun App(command: MutableState<Command>) {
     var lastCommand by remember { command }
     MaterialTheme {
         Column {
-            val command = lastCommand
-            when (command) {
-                is ShowPhoto -> Image(loadImageBitmap(command.url.openStream()), "Photo", modifier = Modifier.fillMaxSize())
-            }
+            Media(lastCommand)
         }
+    }
+}
+
+@Composable
+fun Media(command: Command) {
+    when (command) {
+        is ShowPhoto -> Image(loadImageBitmap(command.url.openStream()), "Photo", modifier = Modifier.fillMaxSize())
     }
 }
 
