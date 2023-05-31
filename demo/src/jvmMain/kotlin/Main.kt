@@ -11,6 +11,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.net.URL
@@ -41,6 +42,11 @@ data class ShowPhoto(val url: URL) : Command
 
 fun main(): Unit = runBlocking {
     val command: MutableState<Command> = mutableStateOf(ShowPhoto(resource("/koala.jpg")))
+    val dispatcher = actor<Command> {
+        for (msg in channel) {
+            command.value = msg
+        }
+    }
     async {
         application {
             val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
@@ -51,6 +57,6 @@ fun main(): Unit = runBlocking {
     }
     async {
         delay(4.seconds)
-        command.value = ShowPhoto(resource("/koala-bis.jpg"))
+        dispatcher.send(ShowPhoto(resource("/koala-bis.jpg")))
     }
 }
