@@ -67,6 +67,7 @@ It was easy enough to tweak it to show an image instead.
 I also tweaked the window title and made the app start in fullscreen.
 
 [source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
 ----
 include::git@demo/src/jvmMain/kotlin/Main.kt[revision=254e95449c6ba885ae4cc100583765dbe0afb97d,lines=16..34]
 ----
@@ -84,6 +85,7 @@ and let the view to be a dummy layer that acts on commands.
 The next thing I verified is how to update the view.
 
 [source,kotlin]
+.demo/src/jvmMain/kotlin/Main.kt
 ----
 include::git@demo/src/jvmMain/kotlin/Main.kt[revision=e97155686c1cba2029f4573c2a452a766f1a773c,lines=16..32]
 ----
