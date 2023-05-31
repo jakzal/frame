@@ -8,7 +8,7 @@ function build_html() {
   source=$2
   target=$3
   printf '%s' "$name "
-  output=$(asciidoctor $source -o $target 2>&1) \
+  output=$(asciidoctor -r asciidoctor-git-include $source -o $target 2>&1) \
     && echo "✔︎" \
     || echo "✗"
   [[ "$output" -eq "" ]] || echo $output
