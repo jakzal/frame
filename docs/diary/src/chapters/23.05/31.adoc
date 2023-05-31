@@ -1,0 +1,114 @@
+= The one with a demo
+
+I've decided to give https://www.jetbrains.com/lp/compose-multiplatform/[Compose Multiplatform] a go.
+
+[quote,Compose Multiplatform website]
+____
+Declarative framework for sharing UIs across multiple platforms. Based on Kotlin and Jetpack Compose.
+____
+
+Since I'm totally new to Compose and have no understanding of what's required to bootstrap it,
+I generated a demo Compose Multiplatform project in IntelliJ.
+
+.Creating a new Compose Multiplatform project in IntelliJ IDEA
+image::intellij-compose-new-project.png["New Compose Project"]
+
+== Build problems
+
+I immediately run into build problems. You'd expect IntelliJ knows how to generate a project it could build...
+
+The application run just fine from command line:
+
+```bash
+./gradlew run
+```
+
+That made me look at the project SDKs.
+
+Not sure why all kinds of different JDK versions were set up for the project modules by IntelliJ.
+
+.Project SDK configuration in IntelliJ IDEA
+image::intellij-project-sdk.png[Project SDK]
+
+.Module SDK configuration in IntelliJ IDEA
+image::intellij-module-sdk.png[Project SDK]
+
+Aligning them has not helped much (in `Project Structure` -> `Project` and `Modules`).
+
+[TIP]
+====
+Shortcut tip:
+
+* `Cmd+Shift+A` (MacOS)
+* `Ctrl+Shift+A` (Win/Linux)
+
+To run any action in IntelliJ IDEA press the above combination
+and start typing the name of the action you'd like to invoke.
+
+.Running any action in IntelliJ IDEA
+image::intellij-action.png[Invoke any action in IntelliJ]
+====
+
+What ultimately fixed the problem was setting the `Gradle JVM`
+(`Settings` -> `Build, Execution, Deployment` -> `Gradle`).
+I keep forgetting to do this and it defaults to 1.8.
+
+.Gradle JVM configuration in IntelliJ IDEA
+image::intellij-gradle-jvm.png[Gradle JVM]
+
+I usually don't have this problem in command line thanks to https://sdkman.io/[sdkman].
+
+== Learning to display an image
+
+First thing I needed to learn is how to display an image.
+
+The generated demo shows a button that changes the text on click.
+It was easy enough to tweak it to show an image instead.
+I also tweaked the window title and made the app start in fullscreen.
+
+[source,kotlin]
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=254e95449c6ba885ae4cc100583765dbe0afb97d,lines=16..34]
+----
+
+.Running the app from IntelliJ
+image::intellij-run.png[Running the app from IntelliJ]
+
+.Demo app
+image::demo-koala-frame.png[Demo showing Koala in the Frame]
+
+== Learning to change the view
+
+I'd like the application to be mostly implemented outside of the view,
+and let the view to be a dummy layer that acts on commands.
+The next thing I verified is how to update the view.
+
+[source,kotlin]
+----
+include::git@demo/src/jvmMain/kotlin/Main.kt[revision=e97155686c1cba2029f4573c2a452a766f1a773c,lines=16..32]
+----
+
+Compose has a special https://developer.android.com/jetpack/compose/state:[syntax for mutable state].
+Such state is monitored and the UI is automatically updated when state changes.
+
+== Building distributions
+
+The last thing I wanted to check is how to package a Compose Multiplatform app.
+The demo is pre-configured, so running `./gradlew package` creates a package for the current platform.
+
+So far I was only able to test it on MacOS. It generates a `dmg` file that can be used to install the application on MacOS.
+
+.MacOS installer
+image::demo-macos-installer.png[MacOS installer]
+
+I will still need to confirm if it's possible to generate cross-platform packages,
+so that I could generate a package for Raspberry PI on my computer or the CI server.
+
+== Summary
+
+So far so good.
+
+Compose seems to be easy to work with.
+I'm not worried about its stability since my UI will be rather simple.
+I will also attempt to structure the app in a way that's not coupled to the UI,
+so that it's not super hard to replace. At least in the early phases of the project.
