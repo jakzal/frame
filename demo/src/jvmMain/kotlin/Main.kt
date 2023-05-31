@@ -29,7 +29,8 @@ fun App() {
     }
 }
 
-private fun resourceStream(name: String): InputStream = object {}::class.java.getResource("/$name").openStream()
+private fun resourceStream(name: String): InputStream =
+    object {}::class.java.getResource("/$name")?.openStream() ?: InputStream.nullInputStream()
 
 fun main() = application {
     val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
