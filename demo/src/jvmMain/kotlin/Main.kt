@@ -13,35 +13,40 @@ import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.io.InputStream
+import java.net.URL
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 @Preview
-fun App(currentPhoto: MutableState<InputStream>) {
-    var displayedPhoto by remember { currentPhoto }
+fun App(command: MutableState<Command>) {
+    var lastCommand by remember { command }
     MaterialTheme {
         Column {
-            Image(loadImageBitmap(displayedPhoto), "Photo", modifier = Modifier.fillMaxSize())
+            val command = lastCommand
+            when (command) {
+                is ShowPhoto -> Image(loadImageBitmap(command.url.openStream()), "Photo", modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }
 
-private fun resourceStream(name: String): InputStream =
-    object {}::class.java.getResource("/$name")?.openStream() ?: InputStream.nullInputStream()
+private fun resource(name: String): URL = object {}::class.java.getResource("$name")
+
+sealed interface Command
+data class ShowPhoto(val url: URL) : Command
 
 fun main(): Unit = runBlocking {
-    val currentPhoto = mutableStateOf(resourceStream("koala.jpg"))
+    val command: MutableState<Command> = mutableStateOf(ShowPhoto(resource("/koala.jpg")))
     async {
         application {
             val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
             Window(onCloseRequest = ::exitApplication, title = "Frame", state = state) {
-                App(currentPhoto)
+                App(command)
             }
         }
     }
     async {
         delay(4.seconds)
-        currentPhoto.value = resourceStream("koala-bis.jpg")
+        command.value = ShowPhoto(resource("/koala-bis.jpg"))
     }
 }
