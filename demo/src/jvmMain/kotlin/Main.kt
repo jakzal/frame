@@ -10,21 +10,19 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.io.InputStream
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 @Preview
-fun App() {
-    var displayedPhoto by remember { mutableStateOf(resourceStream("koala.jpg")) }
+fun App(currentPhoto: MutableState<InputStream>) {
+    var displayedPhoto by remember { currentPhoto }
     MaterialTheme {
         Column {
-            Image(loadImageBitmap(displayedPhoto), "Default photo", modifier = Modifier.fillMaxSize())
-        }
-        LaunchedEffect(Unit) {
-            delay(4.seconds)
-            displayedPhoto = resourceStream("koala-bis.jpg")
+            Image(loadImageBitmap(displayedPhoto), "Photo", modifier = Modifier.fillMaxSize())
         }
     }
 }
@@ -32,9 +30,18 @@ fun App() {
 private fun resourceStream(name: String): InputStream =
     object {}::class.java.getResource("/$name")?.openStream() ?: InputStream.nullInputStream()
 
-fun main() = application {
-    val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
-    Window(onCloseRequest = ::exitApplication, title = "Frame", state = state) {
-        App()
+fun main(): Unit = runBlocking {
+    val currentPhoto = mutableStateOf(resourceStream("koala.jpg"))
+    async {
+        application {
+            val state = rememberWindowState(placement = WindowPlacement.Fullscreen)
+            Window(onCloseRequest = ::exitApplication, title = "Frame", state = state) {
+                App(currentPhoto)
+            }
+        }
+    }
+    async {
+        delay(4.seconds)
+        currentPhoto.value = resourceStream("koala-bis.jpg")
     }
 }
