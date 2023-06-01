@@ -1,9 +1,11 @@
-:imagesdir: {imagesdir}/23.06
+:imagesdir: images/23.06
 
 = June
 
 :leveloffset: +1
 
 include::01.adoc[]
+
+include::02.adoc[]
 
 :leveloffset: -1

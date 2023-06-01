@@ -1,4 +1,4 @@
-:imagesdir: {imagesdir}/23.05
+:imagesdir: images/23.05
 
 = May
 
