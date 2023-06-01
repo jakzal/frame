@@ -1,0 +1,55 @@
+= The one with the clean slate
+
+== Starting fresh
+
+I started the day with generating a fresh Gradle project using the gradle command.
+Just like most of the times I have chosen to use subprojects.
+
+.gradle init
+image::gradle-init.png[gradle init]
+
+Since Gradle generates example subprojects I always need to clean it up and remove unneded code before continuing.
+I do it this way to keep myself up to date with latest Gradle goodies, but also to get
+the `build-logic` subproject (previously `buildSrc`).
+
+Just to aid IntelliJ a bit I also configured the jvm toolchain in Gradle.
+Unfortunately it keeps defaulting to Java 1.8 so when the project is first imported to IntelliJ,
+the Project SDK, Gradle JVM, and the Target JVM Version in Kotlin Compiler settings need to be configured.
+
+[source,kotlin]
+.build-logic/src/main/kotlin/frame.kotlin-common-conventions.gradle.kts
+----
+include::git@build-logic/src/main/kotlin/frame.kotlin-common-conventions.gradle.kts[revision=075996fa34d80442b669c76ff8ee220df176caf8,lines=20..22]
+----
+
+Next, I moved on to replacing the explicit use of JUnit with kotlin.test:
+
+[source,kotlin]
+.build-logic/src/main/kotlin/frame.kotlin-common-conventions.gradle.kts
+----
+include::git@build-logic/src/main/kotlin/frame.kotlin-common-conventions.gradle.kts[revision=8b8a569231284edb5e15157e4944149a6f92129f,lines=9..11]
+----
+
+and wrote a test to verify IntelliJ knows how to run them:
+
+[source,kotlin]
+.frame/src/test/kotlin/frame/VerificationTest.kt
+----
+include::git@frame/src/test/kotlin/frame/VerificationTest.kt[revision=e585b147d1a64500fc6699767d3359e7ab9da40d]
+----
+
+IntelliJ didn't want to cooperate to run all the tests and complained:
+
+```
+Error running 'All in frame': No junit.jar
+```
+
+I had to additionally tweak the run configuration to search for tests in the whole project:
+
+.test run configuration
+image::test-run-configuration.png[test run configuration]
+
+Now we're ready to start doing some real work.
+
+.test run verification
+image::test-run-verification.png[test run verification]
