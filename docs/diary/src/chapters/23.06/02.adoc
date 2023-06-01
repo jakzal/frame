@@ -53,3 +53,89 @@ Now we're ready to start doing some real work.
 
 .test run verification
 image::test-run-verification.png[test run verification]
+
+Except...
+
+== Learning coroutines
+
+I wasn't sure where to start.
+
+I will need some kind of asynchronous message sending/handling.
+
+I thought I could leverage the Actor model. I have some experience using and contributing to Vlingo XOOM,
+a java based implementation. Compared to XOOM, Kotlin's actor implementation is very basic.
+
+It's part of an obsolete API anyway, so it's time to look into Kotlin coroutines. Back to the learning mode.
+
+I headed to the https://kotlinlang.org/docs/coroutines-guide.html[Coroutines Guide] and
+https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/[Coroutines Testing Documentation],
+started playing with examples in learning tests.
+
+First things first. Let me see how to launch a coroutine.
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt[revision=0211c759fc4696f2f6dfe39f686e8178fe990250]
+----
+
+`runTest` behaves similarly to `runBlocking`, but has some features useful in tests.
+For example, it skips calls to delay while preserving the relative execution order.
+The test above only takes milliseconds to run, instead of over a second.
+
+Managing state this way is not thread safe, but I'm sure I'll learn how to do it properly soon.
+
+https://kotlinlang.org/docs/coroutines-and-channels.html#channels[Channels] are a way for coroutines
+to communicate with each other.
+
+There are four types of channels.
+
+rendezvous (default):
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt[revision=3f9a970892df845f5229e88c237d2af4cd362b6a,lines=30..52]
+----
+
+unlimited:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt[revision=3f9a970892df845f5229e88c237d2af4cd362b6a,lines=54..76]
+----
+
+buffered:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt[revision=3f9a970892df845f5229e88c237d2af4cd362b6a,lines=78..100]
+----
+
+conflated:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt[revision=3f9a970892df845f5229e88c237d2af4cd362b6a,lines=102..122]
+----
+
+I also tried adding `delay()` calls in between `channel.send()` calls to see how it affects the receiver.
+
+If there's more than one receiver, each message is still handled only once:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnCoroutinesTest.kt[revision=a2a5cd51afbd6731ee1aa74a2cd6a5e62d6a4664,lines=123..163]
+----
+
+For the project, I will need to potentially each message to be handled by multiple receivers.
+It seems that `BroadcastChannel` used to be the way to go, but it's now being replaced with `SharedFlow`.
+
+== Summary
+
+I've learnt some Kotlin coroutine basics but there's still some docs I haven't even read.
+I sure don't know enough to send a single message to multiple coroutines.
