@@ -1,10 +1,9 @@
 package pl.zalas.frame
 
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -119,5 +118,47 @@ class LearnCoroutinesTest {
         advanceTimeBy(1.seconds)
 
         assertEquals(listOf("A done", "B done", "B1"), messages)
+    }
+
+    @Test
+    fun `learn how to use channels (multiple receivers)`() = runTest {
+        var messages = mutableListOf<String>();
+        val channel = Channel<String>(UNLIMITED)
+        launch {
+            channel.send("A1")
+            channel.send("A2")
+            messages.add("A done")
+        }
+        launch {
+            channel.send("B1")
+            messages.add("B done")
+        }
+        val receiver1 = launch {
+            repeat(3) {
+                val x = channel.receive()
+                messages.add("R1$x")
+                delay(1.seconds)
+            }
+        }
+        val receiver2 = launch {
+            repeat(3) {
+                val x = channel.receive()
+                messages.add("R2$x")
+                delay(1.seconds)
+            }
+        }
+        val receiver3 = launch {
+            repeat(3) {
+                val x = channel.receive()
+                messages.add("R3$x")
+                delay(1.seconds)
+            }
+        }
+        advanceTimeBy(10.seconds)
+        receiver1.cancelAndJoin()
+        receiver2.cancelAndJoin()
+        receiver3.cancelAndJoin()
+
+        assertEquals(listOf("A done", "B done", "R1A1", "R2A2", "R3B1"), messages)
     }
 }
