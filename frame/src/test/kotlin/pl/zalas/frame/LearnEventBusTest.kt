@@ -3,10 +3,7 @@ package pl.zalas.frame
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.coroutineContext
 import kotlin.test.Test
@@ -60,6 +57,27 @@ class LearnEventBusTest {
         )
     }
 
+    @Test
+    fun `it publishes events to subscribers with state`() = runTest(timeout = 1.seconds) {
+        val eventBus = EventBus()
+
+        val subscriber = async {
+            eventBus.subscribe<TemperatureState, TemperatureRead>(TemperatureState(0)) { state, event ->
+                TemperatureState(event.degrees, state.previousReads + listOf(state.lastRead))
+            }
+        }
+
+        delay(1)
+
+        eventBus.publish(TemperatureRead(22))
+        eventBus.publish(TemperatureRead(19))
+        eventBus.publish(LightTurnedOn("Kitchen"))
+        eventBus.publish(TemperatureRead(20))
+        eventBus.publish(EventBus.SystemShuttingDown)
+
+        assertEquals(TemperatureState(20, listOf(0, 22, 19)), subscriber.await())
+    }
+
     class EventBus {
         object SystemShuttingDown
 
@@ -80,9 +98,21 @@ class LearnEventBusTest {
                     subscriber(event)
                 }
         }
+
+        suspend inline fun <reified STATE, reified EVENT> subscribe(
+            state: STATE,
+            crossinline subscriber: suspend (STATE, EVENT) -> STATE
+        ): STATE = events.takeWhile { event -> event !is SystemShuttingDown }
+            .filterIsInstance<EVENT>()
+            .fold(state) { state, event ->
+                coroutineContext.ensureActive()
+                subscriber(state, event)
+            }
     }
 
     interface Event
     data class TemperatureRead(val degrees: Int) : Event
     data class LightTurnedOn(val name: String) : Event
+
+    data class TemperatureState(val lastRead: Int = 0, val previousReads: List<Int> = emptyList())
 }
