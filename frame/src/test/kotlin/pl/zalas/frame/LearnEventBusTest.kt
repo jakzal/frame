@@ -62,7 +62,7 @@ class LearnEventBusTest {
         val eventBus = EventBus()
 
         val subscriber = async {
-            eventBus.subscribe<TemperatureState, TemperatureRead>(TemperatureState(0)) { state, event ->
+            eventBus.subscribe(TemperatureState(0)) { state, event: TemperatureRead ->
                 TemperatureState(event.degrees, state.previousReads + listOf(state.lastRead))
             }
         }
