@@ -29,7 +29,7 @@ Sounds like exactly what I need.
 [source,kotlin]
 .frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
 ----
-include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=58..70]
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=58..70,indent=0]
 ----
 
 Feeling I'm getting closer to something I could use I defined some example events:
@@ -37,7 +37,7 @@ Feeling I'm getting closer to something I could use I defined some example event
 [source,kotlin]
 .frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
 ----
-include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=72..74]
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=72..74,indent=0]
 ----
 
 and wrote an example of how to use the event bus:
@@ -45,7 +45,33 @@ and wrote an example of how to use the event bus:
 [source,kotlin]
 .frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
 ----
-include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=29..57]
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=29..57,indent=0]
+----
+
+In real life, instead of using `Flow.take()` to consume a fixed number of events:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=ea6ebc2fd41494437185b23ef1387f32ac663d46,lines=34,indent=0]
+----
+
+I'd use something like `Flow.takeWhile()` instead:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=ea6ebc2fd41494437185b23ef1387f32ac663d46,lines=65,indent=0]
+----
+
+That would require publishing a special event to terminate the flow:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=ea6ebc2fd41494437185b23ef1387f32ac663d46,lines=108,indent=0]
+----
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=ea6ebc2fd41494437185b23ef1387f32ac663d46,lines=79,indent=0]
 ----
 
 Promising!
