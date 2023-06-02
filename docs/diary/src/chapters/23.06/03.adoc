@@ -112,6 +112,27 @@ to the `subscribe()` method:
 include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=1fa1c9dcc6e0041c49d778f76f2bbde01a90afa5,indent=0,lines=30;32]
 ----
 
+== Immutable subscribers
+
+I thought I'm done for the day, but then I really couldn't stop thinking of making subscribers immutable.
+Subscribers will need to work with state, so I'll need a way to provide it to the subscriber.
+
+The idea is to provide the initial state for the first time the subscriber is called:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=42c68ea0a473ed12d41fd87810555c179cbac1a3,indent=0,lines=60..79;116..117]
+----
+
+The subscriber will return a new state, which should be passed the next time the subscriber is called.
+
+It was surprisingly easy to implement:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=42c68ea0a473ed12d41fd87810555c179cbac1a3,indent=0,lines=81;102..111]
+----
+
 == Summary
 
 I don't know if I'm going to use coroutines and `Flow` from the beginning, but
