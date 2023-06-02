@@ -75,3 +75,45 @@ include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=ea6
 ----
 
 Promising!
+
+== More of the event bus
+
+Last thing I've done today was playing a bit more with the event bus idea.
+
+I wanted a better way to subscribe to events:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=1fa1c9dcc6e0041c49d778f76f2bbde01a90afa5,indent=0,lines=23..25]
+----
+
+This way the subscriber could be any callable that doesn't need to be aware of the Flow.
+
+Here's the whole test case:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=1fa1c9dcc6e0041c49d778f76f2bbde01a90afa5,indent=0,lines=17..61]
+----
+
+All the details of handling the special shutdown event and filtering of events is hidden in the `EventBus`:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=1fa1c9dcc6e0041c49d778f76f2bbde01a90afa5,indent=0,lines=63..83]
+----
+
+The `subscribe()` method is marked as `inline`, which means it will be inlined by the compiler at its call sites.
+In addition, since the parameter `T` is `reified`, we don't need to pass the event type as an argument
+to the `subscribe()` method:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=1fa1c9dcc6e0041c49d778f76f2bbde01a90afa5,indent=0,lines=30;32]
+----
+
+== Summary
+
+I don't know if I'm going to use coroutines and `Flow` from the beginning, but
+surely they'll prove themselves useful at some point.
+I think I've learnt enough to move to the next step.
