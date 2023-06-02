@@ -1,0 +1,51 @@
+= The one with the flow
+
+Since the `BroadcastChannel` is obsolete and its docs suggest to use the `SharedFlow` instead,
+it's time to look into https://kotlinlang.org/docs/flow.html#flows[Kotlin Asynchronous Flow].
+
+== Playing with flows
+
+Flow is similar to streams from usage perspective:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=6edbb5f8f107bdced3450933bd384e52898da94c]
+----
+
+For our project, I'm interested in the `SharedFlow`. It might not be currently documented in user docs, but
+https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-shared-flow/[API docs]
+fill that gap pretty well.
+
+[quote,SharedFlow]
+----
+SharedFlow is useful for broadcasting events that happen inside an application to subscribers that can come and go.
+----
+
+Sounds like exactly what I need.
+
+`SharedFlow` docs even have an example of an `EventBus` that I could play with:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=58..70]
+----
+
+Feeling I'm getting closer to something I could use I defined some example events:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=72..74]
+----
+
+and wrote an example of how to use the event bus:
+
+[source,kotlin]
+.frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnFlowsTest.kt[revision=4980cba3708d843b603c60392e51a748eb8cc060,lines=29..57]
+----
+
+Promising!

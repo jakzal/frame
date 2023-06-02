@@ -56,6 +56,39 @@ class LearnFlowsTest {
         assertEquals(expectedEvents, secondSubscriberEvents.await())
     }
 
+    @Test
+    fun `learn how to complete a shared flow`() = runTest(timeout = 1.seconds) {
+        val eventBus = EventBus()
+
+        val firstSubscriberEvents = async {
+            // SharedFlow never completes. That's why we need a flow-truncating operation like `takeWhile()`.
+            eventBus.events.takeWhile { e -> e !is  SystemShuttingDown}.toList()
+        }
+        val secondSubscriberEvents = async {
+            eventBus.events.takeWhile { e -> e !is  SystemShuttingDown}.toList()
+        }
+
+        // Delay is required to give subscribers a chance to catch the first event.
+        // alternatively, MutableSharedFlow could be configured with `replay = 5` to notify subscribers about past events.
+        delay(1)
+
+        eventBus.publish(TemperatureRead(22))
+        eventBus.publish(TemperatureRead(19))
+        eventBus.publish(LightTurnedOn("Kitchen"))
+        eventBus.publish(TemperatureRead(20))
+        eventBus.publish(SystemShuttingDown)
+
+        val expectedEvents = listOf(
+            TemperatureRead(22),
+            TemperatureRead(19),
+            LightTurnedOn("Kitchen"),
+            TemperatureRead(20)
+        )
+
+        assertEquals(expectedEvents, firstSubscriberEvents.await())
+        assertEquals(expectedEvents, secondSubscriberEvents.await())
+    }
+
     class EventBus() {
         // mutable flow has the emit() capability
         private val _events = MutableSharedFlow<Event>()
@@ -72,4 +105,5 @@ class LearnFlowsTest {
     interface Event
     data class TemperatureRead(val degrees: Int) : Event
     data class LightTurnedOn(val name: String) : Event
+    object SystemShuttingDown : Event
 }
