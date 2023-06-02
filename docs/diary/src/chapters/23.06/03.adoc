@@ -126,15 +126,37 @@ include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=
 
 The subscriber will return a new state, which should be passed the next time the subscriber is called.
 
-It was surprisingly easy to implement:
+Instead of:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=42c68ea0a473ed12d41fd87810555c179cbac1a3,indent=0,lines=65..66]
+----
+
+we could use:
+
+[source,kotlin]
+----
+include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=c1ecf840db8021d00c2ed2d1bd1fefc0b04df068,indent=0,lines=65..66]
+----
+
+Anyway, it was surprisingly easy to implement:
 
 [source,kotlin]
 ----
 include::git@frame/src/test/kotlin/pl/zalas/frame/LearnEventBusTest.kt[revision=42c68ea0a473ed12d41fd87810555c179cbac1a3,indent=0,lines=81;102..111]
 ----
 
+Did I mention Kotlin is great?
+
 == Summary
 
 I don't know if I'm going to use coroutines and `Flow` from the beginning, but
 surely they'll prove themselves useful at some point.
 I think I've learnt enough to move to the next step.
+
+Perhaps, I'll need two buses - an event bus and a command bus.
+
+The command bus handler would respond with a new state and a list of events.
+
+The event bus subscriber would respond with a new state and a list of commands.
