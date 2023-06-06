@@ -35,3 +35,13 @@ kotlin {
         }
     }
 }
+
+tasks {
+    @Suppress("UNUSED_VARIABLE")
+    val jvmTest by getting(Test::class) {
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
+        }
+    }
+}
