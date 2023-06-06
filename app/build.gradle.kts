@@ -25,5 +25,13 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
+        @Suppress("UNUSED_VARIABLE")
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.compose.ui:ui-test-junit4:${extra["compose.version"]}")
+                implementation("org.junit.vintage:junit-vintage-engine:5.6.3")
+            }
+        }
     }
 }
