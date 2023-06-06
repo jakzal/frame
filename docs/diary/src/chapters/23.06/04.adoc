@@ -1,0 +1,245 @@
+= The one with two steps back and three steps forward
+
+I thought the Compose Multiplatform layer will become a separate module eventually.
+I expected that I will need to extract it at some point as the project grows.
+
+After reading some more about Compose Multiplatform, Jetpack Compose, and Kotlin Multiplatform projects
+I decided it is important to isolate Compose in its own Gradle subproject from the beginning.
+I don't want it to impose structure or tools on my whole project. I want it to be a plugin to my application.
+Compose still uses junit4? No problem! It's only a fraction of the whole test suite isolated in this little module.
+
+It took me a couple of two-hour sessions to figure this out, as it isn't the default way
+people create Compose Multiplatform projects. When I started, I didn't really understand what I was doing.
+The exercise, however, let me understand Compose Multiplatform a little bit better.
+
+As I was figuring it out I've been creating a https://mikadomethod.info/[Mikado Graph]
+of steps required.
+
+When figuring things out and hacking around we sometimes make changes that aren't contributing to the solution.
+We're making a mess.
+
+To make sure I only make necessary changes, I've been regularly reverting the changes, recreating the graph,
+building the project, running tests, and finding new steps that are required.
+
+My starting point was the demo I generated the other day.
+However, I only wanted to use the code I understand.
+
+.Mikado Graph
+image::setting-up-tests-for-compose-project-1.svg[Mikado Graph]
+
+At some point I stopped encountering compilation errors and the simple compose test I wrote
+was passing. That meant my graph was complete. I could revert everything and start over one last time.
+This time committing the changes.
+
+Below are the steps I followed. Each step ends to a project that compiles.
+
+== Downgrading the Kotlin Gradle plugin
+
+1. Downgrade the Kotlin Gradle plugin to 1.8.20 for compatibility with the Multiplatform plugin.
++
+I bootstrapped the project with Kotlin 1.8.21, so I had to downgrade it for now:
++
+[source,kotlin]
+.build-logic/build.gradle.kts
+----
+include::git@build-logic/build.gradle.kts[revision=8994b964e72f8d853d899b8cab4737096f5b008f,lines=17..19]
+----
++
+2. Configure the kotlin version for the gradle plugin based on a gradle property.
++
+[source,properties]
+.gradle.properties
+----
+include::git@gradle.properties[revision=ab9c9dec47bd6659cef3bf8b60b743c9b01d50dd,lines=6]
+----
++
+[source,kotlin]
+.settings.gradle.kts
+----
+include::git@settings.gradle.kts[revision=ab9c9dec47bd6659cef3bf8b60b743c9b01d50dd,lines=11;15..18]
+----
++
+3. Do not specify the kotlin gradle plugin version explicitly.
++
+[source,kotlin]
+.build-logic/build.gradle.kts
+----
+include::git@build-logic/build.gradle.kts[revision=2a59aa7d59e353eb1498eb1fb23b83ce795d55e5,lines=17..19]
+----
+
+.Mikado Graph
+image::setting-up-tests-for-compose-project-2.svg[Mikado Graph]
+
+== Bootstrapping the app project
+
+My Compose project will be called `app`.
+
+1. Create the `app` project by adding an empty `app/build.gradle.kts` build file.
+
+2. Include the `app` project in the main project build.
++
+[source,kotlin]
+.settings.gradle.kts
+----
+include::git@settings.gradle.kts[revision=57b3719e4f6a87fc9c2a6a82007a7d1acc994ae5,lines=25..27]
+----
+
+3. Define plugin versions for Kotlin Multiplatform and Compose.
++
+[source,properties]
+.gradle.properties
+----
+include::git@gradle.properties[revision=9e54bc97d6c9f4fdc2d0b319e2ae42fafbe77c39,lines=7]
+----
++
+[source,kotlin]
+.settings.gradle.kts
+----
+include::git@settings.gradle.kts[revision=9e54bc97d6c9f4fdc2d0b319e2ae42fafbe77c39,lines=15..19]
+----
+
+4. Enable Kotlin Multiplatform and Compose in the `app` project.
++
+[source,kotlin]
+.app/build.gradle.kts
+----
+include::git@app/build.gradle.kts[revision=e87bc697f01573866cebf640a1482aa1b9b14ead]
+----
++
+Prevent compilation failures due to
+the Kotlin Gradle plugin loaded multiple times by defining the Multiplatform plugin without applying it
+in `settings.gradle.kts`.
++
+[source,kotlin]
+.settings.gradle.kts
+----
+include::git@settings.gradle.kts[revision=e87bc697f01573866cebf640a1482aa1b9b14ead,lines=22;25..26]
+----
++
+The `app` project will not use our common `build-logic`, but it's fine since there's little it has in common
+with non-multiplatform builds.
+
+5. Confirm the `app` project can load classes from a non-multiplatform project.
++
+Create a class in the `frame` project:
++
+[source,kotlin]
+.frame/src/main/kotlin/pl/zalas/frame/Foo.kt
+----
+include::git@frame/src/main/kotlin/pl/zalas/frame/Foo.kt[revision=dd8d7233200f6a0f731c967216baee225796cb11]
+----
+Create a class in the `app` project that uses the class from `frame`:
++
+[source,kotlin]
+.app/src/commonMain/kotlin/pl/zalas/frame/app/Bar.kt
+----
+include::git@app/src/commonMain/kotlin/pl/zalas/frame/app/Bar.kt[revision=dd8d7233200f6a0f731c967216baee225796cb11]
+----
++
+Declare the `frame` project dependency in the `app`:
++
+[source,kotlin]
+.app/build.gradle.kts
+----
+include::git@app/build.gradle.kts[revision=dd8d7233200f6a0f731c967216baee225796cb11,lines=16;21..30]
+----
++
+Revert this change before continuing.
+
+.Mikado Graph
+image::setting-up-tests-for-compose-project-3.svg[Mikado Graph]
+
+== Bootstrapping tests for Compose Multiplatform
+
+Here I mostly used examples found in the official
+https://developer.android.com/jetpack/compose/testing[Jetpack Compose testing docs].
+
+1. Add test dependencies to the app project.
++
+[source,kotlin]
+.app/build.gradle.kts
+----
+include::git@app/build.gradle.kts[revision=d7a77e414d2f9947bfaabe703b569699a9001982,lines=16;21;28..37]
+----
++
+I need to make a note to remove the version number for junit vintage engine from here,
+so it's in sync with the version used in other projects.
++
+Unfortunately, Compose uses junit4.
+
+2. Add a test that verifies an image is shown.
++
+[source,kotlin]
+.app/src/commonTest/kotlin/pl/zalas/frame/app/AppTest.kt
+----
+include::git@app/src/commonTest/kotlin/pl/zalas/frame/app/AppTest.kt[revision=8279637faff0f26a7cd84228523feecd782db974]
+----
++
+It's not great test, but it's a good start.
++
+We'll also need an empty App so the code compiles:
++
+[source,kotlin]
+.app/src/commonMain/kotlin/pl/zalas/frame/app/Main.kt
+----
+include::git@app/src/commonMain/kotlin/pl/zalas/frame/app/Main.kt[revision=8279637faff0f26a7cd84228523feecd782db974]
+----
+
+3. Make the test pass.
++
+[source,kotlin]
+.app/src/commonMain/kotlin/pl/zalas/frame/app/Main.kt
+----
+include::git@app/src/commonMain/kotlin/pl/zalas/frame/app/Main.kt[revision=8f6cb8d1a705cee7b8dac92e63024f1e64380804,lines=11..20]
+----
+
+4. Configure the jvmTest task to log executed tests in cli.
++
+[source,kotlin]
+.app/build.gradle.kts
+----
+include::git@app/build.gradle.kts[revision=62064e1afa3bc83fe5c9f27f54fa868b0405d768,lines=39..47]
+----
+
+5. Configure the IDE to run all tests with Gradle rather than junit configuration.
++
+.All tests configuration
+image::gradle-all-tests-configuration.png[All tests configuration]
++
+We can now run all the project tests with a single click or shortcut.
+
+I have now completed all the steps to reach the goal at the top of the Mikado Graph.
+
+.Mikado Graph
+image::setting-up-tests-for-compose-project-4.svg[Mikado Graph]
+
+== The main
+
+Finally, I added the `main()` function based on what I've had in the demo project.
+This is so I could manually test.
+
+[source,kotlin]
+.app/src/commonMain/kotlin/pl/zalas/frame/app/Main.kt
+----
+include::git@app/src/commonMain/kotlin/pl/zalas/frame/app/Main.kt[revision=7c9a6930d4fb5c77fcb3c6e776fda461fbf950a8,lines=28..35]
+----
+
+I also configured compose, so I could run it from command line with `./gradlew app:run`:
+
+[source,kotlin]
+.app/build.gradle.kts
+----
+include::git@app/build.gradle.kts[revision=7c9a6930d4fb5c77fcb3c6e776fda461fbf950a8,lines=49..53]
+----
+
+== Summary
+
+I feel like it was a struggle, but a necessary one.
+
+I managed to keep Compose Multiplatform isolated from the rest of the project.
+A big win, since I'm still not fully committed to it.
+
+Good result, given that at one point I was about to give up.
+
+I found the Mikado Method extremely helpful while not only restructuring,
+but also adding new code.
