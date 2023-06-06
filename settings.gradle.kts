@@ -11,6 +11,10 @@
 pluginManagement {
     // Include 'plugins build' to define convention plugins.
     includeBuild("build-logic")
+
+    plugins {
+        id("org.jetbrains.kotlin.kotlin-gradle-plugin").version(extra["kotlin.version"] as String)
+    }
 }
 
 plugins {
