@@ -24,3 +24,4 @@ plugins {
 
 rootProject.name = "frame"
 include("frame")
+include("app")
