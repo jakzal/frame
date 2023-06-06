@@ -45,3 +45,9 @@ tasks {
         }
     }
 }
+
+compose.desktop {
+    application {
+        mainClass = "pl.zalas.frame.app.MainKt"
+    }
+}
