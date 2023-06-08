@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -23,3 +21,27 @@ jobs:
 
       - name: Build and run tests
         run: ./gradlew build
+
+  publish-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build docker images
+        run: cd docker && make
+
+      - name: Build docs
+        run: |
+          docker run -t --rm --name docs -u "$(id -u):$(id -g)" -v $(pwd):/frame -w /frame jakzal/asciidoctor docs/bin/build.sh
+          mv docs/build/diary.html docs/build/index.html && rm docs/build/.gitignore
+
+      - name: Deploy docs
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/build
