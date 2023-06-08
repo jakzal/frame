@@ -1,3 +1,4 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     // We do not include any of the convention plugins from build-logic here
@@ -49,5 +50,8 @@ tasks {
 compose.desktop {
     application {
         mainClass = "pl.zalas.frame.app.MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Deb)
+        }
     }
 }
