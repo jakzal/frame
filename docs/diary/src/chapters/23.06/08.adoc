@@ -1,0 +1,55 @@
+= The one with the hardware
+
+Time to see if Kotlin Multiplatform will work on Raspberry PI.
+
+Normally, I'd treat this as a high risk and verify if the demo I generated works on Raspberry PI much earlier.
+However, I didn't have access to a Raspberry PI device at the time.
+
+I do have access to Raspberry Pi Zero W now. It's an armv6 based model.
+
+== Getting it to boot
+
+I installed https://www.raspberrypi.com/software/[Raspberry Pi OS] with the Raspberry Pi Imager on an sdcard
+and booted the device.
+
+Pi Zero didn't want to cooperate. It would hang some time after the boot.
+
+I thought it's the sdcard and ordered a new one, but that didn't help.
+
+https://raspberrypi.stackexchange.com/questions/130487/kernel-panic-when-using-apt-on-rpi-zero-rpi-os-buster?newreg=e009e87530c147d19db869f22a9f47e4[Disabling ipv6]
+only seem to have helped, but as soon there was high network activity the device would hang.
+
+I thought https://www.raspberrypi.com/documentation/computers/os.html[updating firmware] would help,
+but I needed to run apt for that:
+
+```bash
+sudo apt update
+sudo apt full-upgrade
+sudo reboot
+```
+
+More googling led me to believe it https://forums.raspberrypi.com/viewtopic.php?f=43&t=212777[might be a voltage issue].
+
+In the end, what has fixed RPI freezing was adding the following line to `/boot/config.txt`:
+
+```
+over_voltage=2
+```
+
+== Getting it to run
+
+I needed Java to build the project. Ultimately, I planned to build it on the CI,
+but just to test it I could use the device to build.
+
+There's no Java 19 in repos. Sdkman failed to install a working version.
+I was ready to downgrade to Java 17, but in the process I've learnt that
+Kotlin Coroutines won't work on an armv6 processor.
+
+Coroutines will never work on an armv6 processor: https://github.com/Kotlin/kotlinx.coroutines/issues/855#issuecomment-1462044450
+
+== The end
+
+I'm going to park this project, at least until I can get a hold of a 64bit armv7 based Raspberry PI.
+It seems to be supported under https://kotlinlang.org/docs/native-target-support.html#tier-2[Tier 2] currently.
+
+However, at the moment there seems to be no device availability whatsoever.
